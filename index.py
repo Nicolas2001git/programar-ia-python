@@ -44,7 +44,7 @@ Analiza este contenido:
 
 {texto_final}
 
-Respondé así:
+Con eso respondé así:
 Categoría:
 Subcategoría:
 Monto detectado:
