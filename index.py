@@ -67,3 +67,4 @@ Si falta algo, poné: No identificado.
 
         except Exception as e:
             st.error(f"Ocurrió un error: {e}")
+            
