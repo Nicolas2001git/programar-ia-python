@@ -10,7 +10,7 @@ load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-st.set_page_config(page_title="DocuSmart IA", page_icon="📄")
+st.set_page_config(page_title="DocuSmart IA")
 st.title("DocuSmart IA")
 
 texto_usuario = st.text_area("Escribí un texto")
@@ -21,12 +21,12 @@ contenido = ""
 
 if archivo is not None:
     if archivo.name.endswith(".txt"):
-        contenido = archivo.read().decode("utf-8")
+        contenido = archivo.read().decode("utf-8", errors="ignore")
 
     elif archivo.name.endswith(".pdf"):
         pdf = PdfReader(io.BytesIO(archivo.read()))
         for pagina in pdf.pages:
-            contenido += pagina.extract_text() or ""
+            contenido += (pagina.extract_text() or "") + "\n"
 
     elif archivo.name.endswith(".docx"):
         doc = Document(io.BytesIO(archivo.read()))
@@ -34,7 +34,7 @@ if archivo is not None:
             contenido += p.text + "\n"
 
 if st.button("Analizar"):
-    texto_final = texto_usuario if texto_usuario else contenido
+    texto_final = texto_usuario if texto_usuario.strip() else contenido
 
     if not texto_final.strip():
         st.warning("Escribí un texto o subí un archivo")
@@ -54,12 +54,16 @@ Resumen:
 Si falta algo, poné: No identificado.
 """
 
-        respuesta = client.chat.completions.create(
-            model="gpt-4.1-mini",
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
-        )
+        try:
+            respuesta = client.chat.completions.create(
+                model="gpt-4.1-mini",
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
 
-        resultado = respuesta.choices[0].message.content
-        st.write(resultado)
+            resultado = respuesta.choices[0].message.content
+            st.write(resultado)
+
+        except Exception as e:
+            st.error(f"Ocurrió un error: {e}")
