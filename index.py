@@ -3,13 +3,12 @@ from openai import OpenAI
 from pypdf import PdfReader
 from docx import Document
 import io
+
 st.set_page_config(page_title="DocuSmart IA")
 st.title("DocuSmart IA")
 
 api_key = st.text_input("Ingresá tu OpenAI API Key", type="password")
-
 texto_usuario = st.text_area("Escribí un texto")
-
 archivo = st.file_uploader("O subí un archivo", type=["txt", "pdf", "docx"])
 
 contenido = ""
@@ -27,13 +26,12 @@ if archivo is not None:
         doc = Document(io.BytesIO(archivo.read()))
         for p in doc.paragraphs:
             contenido += p.text + "\n"
-if st.button("Analizar"):
 
+if st.button("Analizar"):
     if not api_key:
         st.warning("Tenés que ingresar tu API Key")
     else:
         client = OpenAI(api_key=api_key)
-
         texto_final = texto_usuario if texto_usuario.strip() else contenido
 
         if not texto_final.strip():
@@ -49,6 +47,7 @@ INSTRUCCIONES:
 Por favor, proporciona la información en el siguiente formato estructurado:
 
 Si falta algo, poné: No identificado.
+
 📋 CATEGORÍA: [Identifica la categoría principal del documento]
 📂 SUBCATEGORÍA: [Especifica la subcategoría correspondiente]
 💰 MONTO DETECTADO: [Extrae cualquier cantidad monetaria encontrada]
@@ -67,8 +66,5 @@ Si falta algo, poné: No identificado.
                 resultado = respuesta.choices[0].message.content
                 st.markdown(resultado)
 
-
             except Exception as e:
                 st.error(f"Ocurrió un error: {e}")
-                print("Hola asdasd ")
-            
